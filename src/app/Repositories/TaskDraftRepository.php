@@ -14,4 +14,9 @@ class TaskDraftRepository implements TaskDraftRepositoryInterface
     {
         return TaskDraft::create($attributes);
     }
+
+    public function find(int|string $id): ?TaskDraft
+    {
+        return TaskDraft::query()->find($id);
+    }
 }

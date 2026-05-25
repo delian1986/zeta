@@ -10,4 +10,6 @@ interface TaskDraftRepositoryInterface
      * @param  array<string, mixed>  $attributes
      */
     public function create(array $attributes): TaskDraft;
+
+    public function find(int|string $id): ?TaskDraft;
 }
