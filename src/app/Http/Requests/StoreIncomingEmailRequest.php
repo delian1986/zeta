@@ -25,6 +25,15 @@ class StoreIncomingEmailRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        // TODO::Sanitize body and subject
+        $this->merge([
+            'subject' => trim((string) $this->input('subject', '')),
+            'body' => trim((string) $this->input('body', '')),
+        ]);
+    }
+
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(
