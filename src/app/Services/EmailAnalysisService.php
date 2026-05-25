@@ -22,6 +22,13 @@ class EmailAnalysisService
 
     public function analyze(Email $email): EmailAnalysisOutcome
     {
+        /**
+         * TODO:: BEfore calling the external API we should saniztize the subject and body for images, html, css/js, etc.
+         * If the body of the email is too big we should consider about splitting it into chuncks.
+         * 
+         * TODO:: We should also consider about using a different AI model for different types of emails.
+         * For example, if the email is from a customer we should use a different model than if the email is from a supplier.
+         */
         $aiResult = $this->callAiAnalysis($email);
 
         if (! $aiResult->taskDetected) {
