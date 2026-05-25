@@ -12,4 +12,8 @@ interface TaskDraftRepositoryInterface
     public function create(array $attributes): TaskDraft;
 
     public function find(int|string $id): ?TaskDraft;
+
+    public function findForUpdate(int|string $id): ?TaskDraft;
+
+    public function markApproved(TaskDraft $draft, ?int $reviewerId): void;
 }

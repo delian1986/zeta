@@ -20,6 +20,11 @@ final class AuditingTaskDraftRepository implements TaskDraftRepositoryInterface
         return $this->inner->find($id);
     }
 
+    public function findForUpdate(int|string $id): ?TaskDraft
+    {
+        return $this->inner->findForUpdate($id);
+    }
+
     /**
      * @param  array<string, mixed>  $attributes
      */
@@ -35,5 +40,22 @@ final class AuditingTaskDraftRepository implements TaskDraftRepositoryInterface
         ]);
 
         return $draft;
+    }
+
+    public function markApproved(TaskDraft $draft, ?int $reviewerId): void
+    {
+        $previousStatus = $draft->status;
+
+        $this->inner->markApproved($draft, $reviewerId);
+
+        $this->audit->log($draft, [
+            'action' => 'task_draft.approved',
+            'old_values' => ['status' => $previousStatus],
+            'new_values' => [
+                'status' => 'approved',
+                'reviewed_by_user_id' => $reviewerId,
+            ],
+            ...$this->actor->resolve(),
+        ]);
     }
 }
