@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\TaskDraftNotApprovableException;
 use App\Exceptions\TaskDraftNotFoundException;
+use App\Exceptions\TaskDraftNotRejectableException;
 use App\Http\Requests\ApproveTaskDraftRequest;
+use App\Http\Requests\RejectTaskDraftRequest;
 use App\Http\Requests\TaskDraftRequest;
 use App\Services\TaskDraftService;
 use Illuminate\Http\JsonResponse;
@@ -37,5 +39,18 @@ class TaskDraftController extends Controller
         }
 
         return response()->json($task, 201);
+    }
+
+    public function reject(RejectTaskDraftRequest $request): JsonResponse
+    {
+        try {
+            $draft = $this->taskDraftService->reject($request->validated('id'));
+        } catch (TaskDraftNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (TaskDraftNotRejectableException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
+        }
+
+        return response()->json($draft, 200);
     }
 }

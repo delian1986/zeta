@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Auditing;
 
+use InvalidArgumentException;
 use App\Models\TaskDraft;
 use App\Repositories\Contracts\AuditLogRepositoryInterface;
 use App\Repositories\Contracts\TaskDraftRepositoryInterface;
@@ -42,17 +43,25 @@ final class AuditingTaskDraftRepository implements TaskDraftRepositoryInterface
         return $draft;
     }
 
-    public function markApproved(TaskDraft $draft, ?int $reviewerId): void
+    public function transitionStatus(TaskDraft $draft, string $to, ?int $reviewerId): void
     {
         $previousStatus = $draft->status;
 
-        $this->inner->markApproved($draft, $reviewerId);
+        $action = match ($to) {
+            'approved' => 'task_draft.approved',
+            'rejected' => 'task_draft.rejected',
+            default => throw new InvalidArgumentException(
+                "Unsupported task draft status transition to \"{$to}\"."
+            ),
+        };
+
+        $this->inner->transitionStatus($draft, $to, $reviewerId);
 
         $this->audit->log($draft, [
-            'action' => 'task_draft.approved',
+            'action' => $action,
             'old_values' => ['status' => $previousStatus],
             'new_values' => [
-                'status' => 'approved',
+                'status' => $to,
                 'reviewed_by_user_id' => $reviewerId,
             ],
             ...$this->actor->resolve(),

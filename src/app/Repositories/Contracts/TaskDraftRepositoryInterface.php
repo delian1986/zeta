@@ -15,5 +15,5 @@ interface TaskDraftRepositoryInterface
 
     public function findForUpdate(int|string $id): ?TaskDraft;
 
-    public function markApproved(TaskDraft $draft, ?int $reviewerId): void;
+    public function transitionStatus(TaskDraft $draft, string $to, ?int $reviewerId): void;
 }

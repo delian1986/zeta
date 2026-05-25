@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\TaskDraftNotApprovableException;
 use App\Exceptions\TaskDraftNotFoundException;
+use App\Exceptions\TaskDraftNotRejectableException;
 use App\Models\Task;
 use App\Models\TaskDraft;
 use App\Repositories\Contracts\TaskDraftRepositoryInterface;
@@ -45,7 +46,7 @@ class TaskDraftService
                 );
             }
 
-            $this->taskDraftRepository->markApproved($draft, $this->currentUserId());
+            $this->taskDraftRepository->transitionStatus($draft, 'approved', $this->currentUserId());
 
             return $this->taskRepository->create([
                 'email_id' => $draft->email_id,
@@ -55,6 +56,33 @@ class TaskDraftService
                 'status' => 'open',
                 'priority' => $draft->priority,
             ]);
+        });
+    }
+
+    public function reject(int|string $id): TaskDraft
+    {
+        return DB::transaction(function () use ($id) {
+            $draft = $this->taskDraftRepository->findForUpdate($id);
+
+            if ($draft === null) {
+                throw new TaskDraftNotFoundException("Task draft {$id} not found.");
+            }
+
+            if ($draft->status !== 'pending_review') {
+                throw new TaskDraftNotRejectableException(
+                    "Task draft {$id} is not pending review (status: {$draft->status})."
+                );
+            }
+
+            if ($this->taskRepository->existsForDraft($draft->id)) {
+                throw new TaskDraftNotRejectableException(
+                    "Task draft {$id} already has an approved task."
+                );
+            }
+
+            $this->taskDraftRepository->transitionStatus($draft, 'rejected', $this->currentUserId());
+
+            return $draft->refresh();
         });
     }
 

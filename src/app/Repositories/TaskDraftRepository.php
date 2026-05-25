@@ -25,10 +25,10 @@ class TaskDraftRepository implements TaskDraftRepositoryInterface
         return TaskDraft::query()->lockForUpdate()->find($id);
     }
 
-    public function markApproved(TaskDraft $draft, ?int $reviewerId): void
+    public function transitionStatus(TaskDraft $draft, string $to, ?int $reviewerId): void
     {
         $draft->update([
-            'status' => 'approved',
+            'status' => $to,
             'reviewed_at' => now(),
             'reviewed_by_user_id' => $reviewerId,
         ]);
