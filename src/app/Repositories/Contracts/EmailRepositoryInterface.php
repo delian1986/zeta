@@ -6,6 +6,10 @@ use App\Models\Email;
 
 interface EmailRepositoryInterface
 {
+    public function findOrFail(int $id): Email;
+
+    public function updateStatus(Email $email, string $status): void;
+
     /**
      * @param  array<string, mixed>  $attributes
      */
