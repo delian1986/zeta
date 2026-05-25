@@ -56,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
             AuditLogRepository::class,
         );
 
+        // TODO:: this could be APIKEY or provider rotation based on token usage or other metrics
         $this->app->bind(AiClientInterface::class, function (Application $app) {
             return match (config('ai.client')) {
                 'openai' => $app->make(OpenAiClient::class),
