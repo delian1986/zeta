@@ -6,7 +6,6 @@ use App\AI\AiClientInterface;
 use App\AI\DTO\EmailAnalysisResult;
 use App\Models\Email;
 use App\Models\TaskDraft;
-use App\Repositories\Contracts\AuditLogRepositoryInterface;
 use App\Repositories\Contracts\EmailRepositoryInterface;
 use App\Repositories\Contracts\TaskDraftRepositoryInterface;
 use App\Services\DTO\EmailAnalysisOutcome;
@@ -19,7 +18,6 @@ class EmailAnalysisService
         private readonly AiClientInterface $aiClient,
         private readonly EmailRepositoryInterface $emailRepository,
         private readonly TaskDraftRepositoryInterface $taskDraftRepository,
-        private readonly AuditLogRepositoryInterface $auditLogRepository,
     ) {}
 
     public function analyze(Email $email): EmailAnalysisOutcome
@@ -81,17 +79,6 @@ class EmailAnalysisService
             );
 
             $this->emailRepository->updateStatus($email, 'draft_created');
-
-            $this->auditLogRepository->createForEmail($email, [
-                'action' => 'draft_created',
-                'old_values' => null,
-                'new_values' => [
-                    'task_draft_id' => $draft->id,
-                    'email_status' => 'draft_created',
-                ],
-                'actor_type' => 'system',
-                'actor_id' => null,
-            ]);
 
             return $draft;
         });

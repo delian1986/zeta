@@ -6,11 +6,14 @@ use App\AI\AiClientInterface;
 use App\AI\MockAiClient;
 use App\AI\OpenAiClient;
 use App\Repositories\AuditLogRepository;
+use App\Repositories\Auditing\AuditingEmailRepository;
+use App\Repositories\Auditing\AuditingTaskDraftRepository;
 use App\Repositories\Contracts\AuditLogRepositoryInterface;
 use App\Repositories\Contracts\EmailRepositoryInterface;
 use App\Repositories\Contracts\TaskDraftRepositoryInterface;
 use App\Repositories\EmailRepository;
 use App\Repositories\TaskDraftRepository;
+use App\Support\Auditing\ActorResolver;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,15 +24,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(
-            EmailRepositoryInterface::class,
-            EmailRepository::class,
-        );
+        $this->app->bind(EmailRepositoryInterface::class, function ($app) {
+            return new AuditingEmailRepository(
+                $app->make(EmailRepository::class),
+                $app->make(AuditLogRepositoryInterface::class),
+                $app->make(ActorResolver::class),
+            );
+        });
 
-        $this->app->bind(
-            TaskDraftRepositoryInterface::class,
-            TaskDraftRepository::class,
-        );
+        $this->app->bind(TaskDraftRepositoryInterface::class, function ($app) {
+            return new AuditingTaskDraftRepository(
+                $app->make(TaskDraftRepository::class),
+                $app->make(AuditLogRepositoryInterface::class),
+                $app->make(ActorResolver::class),
+            );
+        });
 
         $this->app->bind(
             AuditLogRepositoryInterface::class,

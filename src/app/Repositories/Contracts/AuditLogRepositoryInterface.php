@@ -3,12 +3,12 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\AuditLog;
-use App\Models\Email;
+use Illuminate\Database\Eloquent\Model;
 
 interface AuditLogRepositoryInterface
 {
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function createForEmail(Email $email, array $attributes): AuditLog;
+    public function log(Model $auditable, array $attributes): AuditLog;
 }
