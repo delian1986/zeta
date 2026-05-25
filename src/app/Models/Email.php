@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 #[Fillable(['sender', 'subject', 'body', 'status'])]
 class Email extends Model
 {
-    public function aiSuggestions(): HasMany
+    public function taskDrafts(): HasMany
     {
-        return $this->hasMany(AiSuggestion::class);
+        return $this->hasMany(TaskDraft::class);
     }
 
     public function tasks(): HasMany

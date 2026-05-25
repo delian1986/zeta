@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'reviewed_at',
     'reviewed_by_user_id',
 ])]
-class AiSuggestion extends Model
+class TaskDraft extends Model
 {
     protected function casts(): array
     {

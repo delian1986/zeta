@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('email_id')->constrained('emails');
-            $table->foreignId('ai_suggestion_id')->constrained('ai_suggestions');
+            $table->foreignId('task_draft_id')->constrained('task_drafts');
             $table->string('title', 255);
             $table->text('description');
             $table->string('status', 50);

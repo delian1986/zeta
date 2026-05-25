@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ai_suggestions', function (Blueprint $table) {
+        Schema::create('task_drafts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('email_id')->constrained('emails')->cascadeOnDelete();
             $table->string('type', 100);
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ai_suggestions');
+        Schema::dropIfExists('task_drafts');
     }
 };

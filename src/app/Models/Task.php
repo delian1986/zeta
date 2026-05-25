@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable([
     'email_id',
-    'ai_suggestion_id',
+    'task_draft_id',
     'title',
     'description',
     'status',
@@ -22,9 +22,9 @@ class Task extends Model
         return $this->belongsTo(Email::class);
     }
 
-    public function aiSuggestion(): BelongsTo
+    public function taskDraft(): BelongsTo
     {
-        return $this->belongsTo(AiSuggestion::class);
+        return $this->belongsTo(TaskDraft::class);
     }
 
     public function auditLogs(): MorphMany
