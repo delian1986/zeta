@@ -110,7 +110,6 @@ class TaskDraftService
                 );
             }
 
-            $overrides['status'] = 'overridden';
             $this->taskDraftRepository->override($draft, $overrides);
 
             return $draft->refresh();

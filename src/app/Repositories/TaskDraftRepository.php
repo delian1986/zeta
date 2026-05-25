@@ -33,6 +33,8 @@ class TaskDraftRepository implements TaskDraftRepositoryInterface
 
     public function override(TaskDraft $draft, array $attributes): void
     {
+        $overrides['status'] = 'overridden';
+
         $draft->update($attributes);
     }
 }
