@@ -6,9 +6,6 @@ use App\Models\TaskDraft;
 
 interface TaskDraftRepositoryInterface
 {
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
     public function create(array $attributes): TaskDraft;
 
     public function find(int|string $id): ?TaskDraft;
@@ -16,4 +13,6 @@ interface TaskDraftRepositoryInterface
     public function findForUpdate(int|string $id): ?TaskDraft;
 
     public function transitionStatus(TaskDraft $draft, string $to, ?int $reviewerId): void;
+
+    public function override(TaskDraft $draft, array $attributes): void;
 }

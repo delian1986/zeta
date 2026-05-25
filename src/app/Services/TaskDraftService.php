@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\TaskDraftNotApprovableException;
 use App\Exceptions\TaskDraftNotFoundException;
+use App\Exceptions\TaskDraftNotOverridableException;
 use App\Exceptions\TaskDraftNotRejectableException;
 use App\Models\Task;
 use App\Models\TaskDraft;
@@ -81,6 +82,34 @@ class TaskDraftService
             }
 
             $this->taskDraftRepository->transitionStatus($draft, 'rejected', $this->currentUserId());
+
+            return $draft->refresh();
+        });
+    }
+
+    public function override(int|string $id, array $overrides): TaskDraft
+    {
+        return DB::transaction(function () use ($id, $overrides) {
+            $draft = $this->taskDraftRepository->findForUpdate($id);
+
+            if ($draft === null) {
+                throw new TaskDraftNotFoundException("Task draft {$id} not found.");
+            }
+
+            if ($draft->status !== 'pending_review') {
+                throw new TaskDraftNotOverridableException(
+                    "Task draft {$id} is not pending review (status: {$draft->status})."
+                );
+            }
+
+            if ($this->taskRepository->existsForDraft($draft->id)) {
+                throw new TaskDraftNotOverridableException(
+                    "Task draft {$id} already has an approved task."
+                );
+            }
+
+            $overrides['status'] = 'overridden';
+            $this->taskDraftRepository->override($draft, $overrides);
 
             return $draft->refresh();
         });

@@ -26,9 +26,6 @@ final class AuditingTaskDraftRepository implements TaskDraftRepositoryInterface
         return $this->inner->findForUpdate($id);
     }
 
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
     public function create(array $attributes): TaskDraft
     {
         $draft = $this->inner->create($attributes);
@@ -64,6 +61,20 @@ final class AuditingTaskDraftRepository implements TaskDraftRepositoryInterface
                 'status' => $to,
                 'reviewed_by_user_id' => $reviewerId,
             ],
+            ...$this->actor->resolve(),
+        ]);
+    }
+
+    public function override(TaskDraft $draft, array $attributes): void
+    {
+        $oldValues = $draft->only(array_keys($attributes));
+
+        $this->inner->override($draft, $attributes);
+
+        $this->audit->log($draft, [
+            'action' => 'task_draft.overridden',
+            'old_values' => $oldValues,
+            'new_values' => $attributes,
             ...$this->actor->resolve(),
         ]);
     }

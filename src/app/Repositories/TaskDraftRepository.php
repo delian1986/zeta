@@ -7,9 +7,6 @@ use App\Repositories\Contracts\TaskDraftRepositoryInterface;
 
 class TaskDraftRepository implements TaskDraftRepositoryInterface
 {
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
     public function create(array $attributes): TaskDraft
     {
         return TaskDraft::create($attributes);
@@ -32,5 +29,10 @@ class TaskDraftRepository implements TaskDraftRepositoryInterface
             'reviewed_at' => now(),
             'reviewed_by_user_id' => $reviewerId,
         ]);
+    }
+
+    public function override(TaskDraft $draft, array $attributes): void
+    {
+        $draft->update($attributes);
     }
 }
