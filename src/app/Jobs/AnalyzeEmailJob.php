@@ -29,6 +29,7 @@ class AnalyzeEmailJob implements ShouldQueue
     public function handle(EmailAnalysisService $analysisService, EmailRepositoryInterface $emailRepository): void
     {
         $email = $emailRepository->findOrFail($this->emailId);
+        //TODO:: idempotency if the email has already been analyzed...
         $analysisService->analyze($email);
     }
 
